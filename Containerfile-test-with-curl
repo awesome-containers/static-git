@@ -1,0 +1,83 @@
+# https://github.com/awesome-containers/static-bash
+ARG STATIC_BASH_VERSION=5.2.15
+ARG STATIC_BASH_IMAGE=ghcr.io/awesome-containers/static-bash
+
+FROM $STATIC_BASH_IMAGE:$STATIC_BASH_VERSION AS static-bash
+FROM docker.io/debian:bullseye AS build
+
+# hadolint ignore=DL3008
+RUN set -xeu; \
+    apt-get update; \
+    apt-get install --no-install-recommends -y \
+        ca-certificates curl tar xz-utils \
+        build-essential autoconf make; \
+    update-ca-certificates
+
+# https://github.com/git/git
+# https://kernel.org/pub/software/scm/git/
+ARG GIT_VERSION=2.39.2
+
+WORKDIR /src/git
+# RUN git clone --depth 1 --branch "v$GIT_VERSION" https://github.com/git/git.git .
+RUN set -xeu; \
+    curl -#Lo git.tar.xz \
+        "https://kernel.org/pub/software/scm/git/git-$GIT_VERSION.tar.xz"; \
+    tar -xvf git.tar.xz --strip-components=1; \
+    rm -f git.tar.xz
+
+# https://zlib.net/
+ARG ZLIB_VERSION=1.2.13
+
+WORKDIR /src/zlib
+RUN set -xeu; \
+    curl -#Lo zlib.tar.xz \
+        "https://zlib.net/zlib-$ZLIB_VERSION.tar.xz"; \
+    tar -xvf zlib.tar.xz --strip-components=1; \
+    rm -f zlib.tar.xz
+
+# https://curl.se/download/
+ARG CURL_VERSION=7.88.1
+
+WORKDIR /src/curl
+RUN set -xeu; \
+    curl -#Lo curl.tar.xz \
+        "https://curl.se/download/curl-$CURL_VERSION.tar.xz"; \
+    tar -xvf curl.tar.xz --strip-components=1; \
+    rm -f curl.tar.xz
+
+# https://ftp.gnu.org/gnu/openssl/
+ARG OPENSSL_VERSION=3.0.8
+
+WORKDIR /src/openssl
+RUN set -xeu; \
+    curl -#Lo openssl.tar.gz \
+        "https://github.com/openssl/openssl/releases/download/openssl-$OPENSSL_VERSION/openssl-$OPENSSL_VERSION.tar.gz"; \
+    tar -xvf openssl.tar.gz --strip-components=1; \
+    rm -f openssl.tar.gz
+
+WORKDIR /src/git
+COPY patches/ .
+
+# TODO: curl not detected with -static flag
+# checking for curl_global_init in -lcurl... no
+ARG CFLAGS='-w -g -Os -static'
+RUN set -xeu; \
+    patch builtin/init-db.c < template_dir.patch; \
+    make configure; \
+    ./configure --help; \
+    ./configure --bindir="$(pwd)/dist/bin/" --prefix='' \
+        --with-lib=/src/zlib --with-lib=/src/curl --with-lib=/src/openssl \
+        --without-python --without-tcltk; exit 1; \
+    make -j"$(nproc)"; \
+    ls -la dist/bin/; \
+    strip -s -R .comment --strip-unneeded dist/bin/git; \
+    ls -la dist/bin/; \
+    ls -la dist/libexec/*/; \
+    chmod -cR 755 dist/bin/*; \
+    chown -cR 0:0 dist/bin/*; \
+    ! ldd dist/bin/git && :; \
+    ./dist/bin/git --version
+
+# static git image
+FROM static-bash
+COPY --from=build /src/git/dist/bin/git /bin/git

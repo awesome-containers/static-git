@@ -1,0 +1,31 @@
+# https://github.com/awesome-containers/static-bash
+ARG STATIC_BASH_VERSION=5.2.15
+ARG STATIC_BASH_IMAGE=ghcr.io/awesome-containers/static-bash
+
+# https://github.com/awesome-containers/static-git
+ARG STATIC_GIT_VERSION=2.39.2
+ARG STATIC_GIT_IMAGE=ghcr.io/awesome-containers/static-git
+
+# https://github.com/awesome-containers/alpine-build-essential
+ARG BUILD_ESSENTIAL_VERSION=3.17
+ARG BUILD_ESSENTIAL_IMAGE=ghcr.io/awesome-containers/alpine-build-essential
+
+
+FROM $STATIC_BASH_IMAGE:$STATIC_BASH_VERSION-slim AS static-bash
+FROM $STATIC_GIT_IMAGE:$STATIC_GIT_VERSION AS static-git
+FROM $BUILD_ESSENTIAL_IMAGE:$BUILD_ESSENTIAL_VERSION AS build
+
+WORKDIR /src/git
+COPY --from=static-git /bin/git ./
+
+RUN set -xeu; \
+    upx --no-progress --no-color git; \
+    upx -t --no-progress --no-color git; \
+    chmod -cR 755 git; \
+    chown -cR 0:0 git; \
+    ! ldd git && :; \
+    ./git --version
+
+# slim static git image
+FROM static-bash
+COPY --from=build /src/git/git /bin/git

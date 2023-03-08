@@ -1,0 +1,13 @@
+diff --git a/builtin/init-db.c b/builtin/init-db.c
+index dcaaf102ea..1719ceaab3 100644
+--- a/builtin/init-db.c
++++ b/builtin/init-db.c
+@@ -120,7 +120,7 @@ static void copy_templates(const char *template_dir, const char *init_template_d
+ 
+ 	dir = opendir(template_path.buf);
+ 	if (!dir) {
+-		warning(_("templates not found in %s"), template_dir);
++		/* warning(_("templates not found in %s"), template_dir); */
+ 		goto free_return;
+ 	}
+ 
