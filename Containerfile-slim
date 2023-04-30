@@ -3,7 +3,7 @@ ARG STATIC_BASH_VERSION=5.2.15
 ARG STATIC_BASH_IMAGE=ghcr.io/awesome-containers/static-bash
 
 # https://github.com/awesome-containers/static-git
-ARG STATIC_GIT_VERSION=2.40.0
+ARG STATIC_GIT_VERSION=2.40.1
 ARG STATIC_GIT_IMAGE=ghcr.io/awesome-containers/static-git
 
 # https://github.com/awesome-containers/alpine-build-essential

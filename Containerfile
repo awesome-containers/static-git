@@ -15,7 +15,7 @@ RUN set -xeu; \
 
 # https://github.com/git/git
 # https://kernel.org/pub/software/scm/git/
-ARG GIT_VERSION=2.40.0
+ARG GIT_VERSION=2.40.1
 
 WORKDIR /src/git
 # RUN git clone --depth 1 --branch "v$GIT_VERSION" https://github.com/git/git.git .

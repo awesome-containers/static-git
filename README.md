@@ -12,10 +12,10 @@ Statically linked [git] container image with [Bash]
 
 ```bash
 ghcr.io/awesome-containers/static-git:latest
-ghcr.io/awesome-containers/static-git:2.40.0
+ghcr.io/awesome-containers/static-git:2.40.1
 
 docker.io/awesomecontainers/static-git:latest
-docker.io/awesomecontainers/static-git:2.40.0
+docker.io/awesomecontainers/static-git:2.40.1
 ```
 
 Slim statically linked [git] container image with [Bash] and packaged with [UPX]
@@ -24,10 +24,10 @@ Slim statically linked [git] container image with [Bash] and packaged with [UPX]
 
 ```bash
 ghcr.io/awesome-containers/static-git:latest-slim
-ghcr.io/awesome-containers/static-git:2.40.0-slim
+ghcr.io/awesome-containers/static-git:2.40.1-slim
 
 docker.io/awesomecontainers/static-git:latest-slim
-docker.io/awesomecontainers/static-git:2.40.0-slim
+docker.io/awesomecontainers/static-git:2.40.1-slim
 ```
 
 [git]: https://github.com/git/git
